@@ -35,7 +35,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class AbstractKafkaIntegrationTest {
 
     @ClassRule
-    public static KafkaEmbedded embeddedKafka = new KafkaEmbedded(2, true, 4, "test", "test");
+    public static KafkaEmbedded embeddedKafka = new KafkaEmbedded(2, true, 4, "test");
 
     protected BlockingQueue<ConsumerRecord<Long, String>> records;
     private KafkaMessageListenerContainer<Long, String> container;
@@ -46,7 +46,7 @@ public class AbstractKafkaIntegrationTest {
         consumerProps.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, LongDeserializer.class.getName());
         consumerProps.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
         DefaultKafkaConsumerFactory<Long, String> cf = new DefaultKafkaConsumerFactory<>(consumerProps);
-        container = new KafkaMessageListenerContainer<>(cf, new ContainerProperties("test", "test"));
+        container = new KafkaMessageListenerContainer<>(cf, new ContainerProperties("test"));
         records = new LinkedBlockingQueue<>();
         container.setupMessageListener((MessageListener<Long, String>) record -> records.add(record));
         container.start();
@@ -75,7 +75,6 @@ public class AbstractKafkaIntegrationTest {
         public Map<String, Object> consumerConfigs() {
             Map<String, Object> consumerConfigs = kafkaProperties.buildConsumerProperties();
             consumerConfigs.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, KafkaTestUtils.producerProps(embeddedKafka).get(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG));
-            consumerConfigs.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, OffsetResetStrategy.EARLIEST.name().toLowerCase()); //this is specifically for test, because test might have produced record before consumer is ready
             return consumerConfigs;
         }
     }
