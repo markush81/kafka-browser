@@ -6,22 +6,23 @@ install: true
 
 addons:
   sonarqube: true
+
 env:
   global:
-    secure: "mvrqZ/FyEKvLzXfJFIHaR5zTp+ftapnxdMnlpVSveoz2F+HKbMT/Lq0/VClSbYTVKRlIZuo99NiVX4czUbazYltbwMOUmkN5gi8rBvWexxuQXfRuE/g9ZX+gUwdZZts0RCWNf7e7uNPFyJvFy8LC3ioa00R/DVU8r40l/IJQ8TAl1RBQFc4CeWM02PVnoXkzfc/Ey5vd8omdl6nS8+MT78GTwWXvHvQefVbD6B/zjP/CEXAq3d4azoXz3uo3qMiSMsWPgU4NOm0aZ2jyUzvukHNdFsb+ywRJtW9yO4nZO6O6DXTZtGP9sPdLg1+M1XXNF/wV8nBrEaFOWKtXKHI8Mv/vmiTHbIDIqecA2oDY8cA6GkhxQ+jbT/3JpZy2g8oJwekEnFR9dbmwx54fgkzb4CWfw3/nybbmcZgNITBFCj9n/V9NdDWkgW3nO2xeLvrKlVHEYT28CtlGk66+DEClxXiSx35P3qPZSl05/v6k3PsU+RLifADF8fFrdOGHSgLAUyRNbPhHVYp48bSDSJ104jDenO9ZNM6Y5++8Edb7F7O78YETW7MtA6/huaVaENvsmzRZzw1R27GQpxlbC4ji3SVtFjl6jxNV8NyBui8XNK+gw7TCk63gSO59OcWgpOENryLjc814U47Z3zpqj2rao/qkhPAnAZIyWbVoCnHxlGE="
+    secure: "fNO6Be2e0sWHAspWF7+581YPrHeozPpDgTid7CgD65+fXHVEF9d+10X8RdJaXli4mbR6d4yYDZvZAx3ga1TV8LVHxqRNwOltRj5V9xMtZYEe4S862EwUGyhVeFOY2i5EeZw86fHFrxBFY6FIsnDEqOPJkPkhUX2IugkxzlEC+9ModZjnQxQr9dI960jwoWQfBaGrNfkOnMw02+6DUu45pCtdLNNHRUgEGZxmDCtpe/l1qYuAE9blW+YprULj6KMwdRMNAN4RZgq8QqnY+yiHWVBk/Xy/2T9MI5Uq9klwwY8jr0KuyAHlzMw+85jKgyxDZHyOnziN2OFK8RBb1tHyoXFEYJWJTs/YNxt/SGF61HB7otu08z3xrfthwF8sxM7tNwUAU/dKsD0Caraz2N+KxVjtw5GQlEwb5tEKUCoY2D21L4iySe6/XWl7PI+zbm7DP+oIJaEtjC6eSfbcaTRqQnrVLNm6XF5gC6Yb8QTHMr416iBfiTXj82FvLUS/tK31ZH7d5TqUgqJEszMFw3Kp03IQxw+2UEUYgbW7yLIm47R4I7Pc/Uxot+luSGtChH78ofWH1sTjq4lmhdqtfOzVo1SV7GU/rd/d+F/R3uNUwXEucAXHobMgidE0qD8QTlIy/PLGtVFZCsKbA8IEnXDqNeI2MXz57uNITy5yA0wy7Vw="
 
 jdk:
-  - oraclejdk8
+- oraclejdk8
 
 script:
-  - ./gradlew sonarqube
+- ./gradlew sonarqube
 
 cache:
   directories:
-    - '$HOME/.m2/repository'
-    - '$HOME/.sonar/cache'
-    - '$HOME/.gradle'
-    - '.gradle'
+  - $HOME/.m2/repository
+  - $HOME/.sonar/cache
+  - $HOME/.gradle
+  - .gradle
 
 notifications:
   email: false
