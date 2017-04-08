@@ -1,0 +1,19 @@
+spring:
+  kafka:
+    bootstrap-servers:
+      - localhost:9092
+      #- 192.168.10.5:9092
+      #- 192.168.10.6:9092
+      #- 192.168.10.7:9092
+    consumer:
+      maxPollRecords: 10
+  mvc.servlet.load-on-startup: 1
+
+  jackson:
+    serialization:
+      fail_on_empty_beans: false
+      indent_output: true
+      write_dates_as_timestamps: false
+
+server:
+  error.whitelabel.enabled: false

@@ -1,0 +1,83 @@
+package net.mh.kafkabrowser.resource;
+
+import net.mh.kafkabrowser.model.BrowserConsumer;
+import net.mh.kafkabrowser.store.BrowserConsumerStore;
+import org.apache.kafka.clients.consumer.Consumer;
+import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.kafka.common.PartitionInfo;
+import org.apache.kafka.common.serialization.Deserializer;
+import org.apache.kafka.common.serialization.StringDeserializer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
+
+/**
+ * Created by markus on 08.04.17.
+ */
+@RestController
+@RequestMapping
+public class BrowserConsumerResource {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(BrowserConsumerResource.class);
+
+    private Random random;
+    private KafkaProperties kafkaProperties;
+    private BrowserConsumerStore browserConsumerStore;
+
+    @Autowired
+    public BrowserConsumerResource(KafkaProperties kafkaProperties, BrowserConsumerStore browserConsumerStore) {
+        this.random = new Random();
+        this.kafkaProperties = kafkaProperties;
+        this.browserConsumerStore = browserConsumerStore;
+    }
+
+    @RequestMapping(path = "/consumer", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public ResponseEntity<BrowserConsumer> getConsumer() {
+
+        Deserializer<String> stringDeserializer = new StringDeserializer();
+        Map<String, Object> consumerProperties = kafkaProperties.buildConsumerProperties();
+        consumerProperties.put(ConsumerConfig.GROUP_ID_CONFIG, String.format("browser-%s", Math.abs(random.nextInt())));
+        consumerProperties.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
+        consumerProperties.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "false");
+        DefaultKafkaConsumerFactory defaultKafkaConsumerFactory = new DefaultKafkaConsumerFactory(consumerProperties, stringDeserializer, stringDeserializer);
+
+        Consumer kafkaConsumer = defaultKafkaConsumerFactory.createConsumer();
+
+        Map<String, List<PartitionInfo>> topics = kafkaConsumer.listTopics();
+
+
+        BrowserConsumer browserConsumer = new BrowserConsumer(kafkaConsumer, (Integer) consumerProperties.get(ConsumerConfig.MAX_POLL_RECORDS_CONFIG));
+
+        browserConsumer.add(linkTo(methodOn(BrowserConsumerResource.class).getConsumer()).withRel("new"));
+        browserConsumer.add(linkTo(methodOn(BrowserConsumerResource.class).getConsumer(browserConsumer.getConsumerId())).withSelfRel());
+        topics.keySet().forEach(topic -> browserConsumer.add(linkTo(methodOn(TopicResource.class).get(browserConsumer.getConsumerId(), topic)).withRel("topics")));
+
+        browserConsumerStore.add(browserConsumer);
+
+        return getConsumer(browserConsumer.getConsumerId());
+    }
+
+    @RequestMapping(path = "/consumer/{consumerId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public ResponseEntity<BrowserConsumer> getConsumer(@PathVariable String consumerId) {
+        BrowserConsumer browserConsumer = browserConsumerStore.get(consumerId);
+        if (browserConsumer == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(browserConsumer);
+    }
+}
