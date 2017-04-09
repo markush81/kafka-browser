@@ -1,6 +1,7 @@
 package net.mh.kafkabrowser.resource;
 
 import net.mh.kafkabrowser.model.BrowserConsumer;
+import net.mh.kafkabrowser.model.BrowserConsumerRequest;
 import net.mh.kafkabrowser.store.BrowserConsumerStore;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -14,10 +15,7 @@ import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
@@ -31,7 +29,7 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
  */
 @RestController
 @RequestMapping
-public class BrowserConsumerResource {
+public class BrowserConsumerResource extends AbstractResource {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BrowserConsumerResource.class);
 
@@ -47,37 +45,51 @@ public class BrowserConsumerResource {
     }
 
     @RequestMapping(path = "/consumer", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<BrowserConsumer> getConsumer() {
-
-        Deserializer<String> stringDeserializer = new StringDeserializer();
-        Map<String, Object> consumerProperties = kafkaProperties.buildConsumerProperties();
-        consumerProperties.put(ConsumerConfig.GROUP_ID_CONFIG, String.format("browser-%s", Math.abs(random.nextInt())));
-        consumerProperties.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
-        consumerProperties.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "false");
-        DefaultKafkaConsumerFactory defaultKafkaConsumerFactory = new DefaultKafkaConsumerFactory(consumerProperties, stringDeserializer, stringDeserializer);
-
-        Consumer kafkaConsumer = defaultKafkaConsumerFactory.createConsumer();
-
-        Map<String, List<PartitionInfo>> topics = kafkaConsumer.listTopics();
-
-
-        BrowserConsumer browserConsumer = new BrowserConsumer(kafkaConsumer, (Integer) consumerProperties.get(ConsumerConfig.MAX_POLL_RECORDS_CONFIG));
-
-        browserConsumer.add(linkTo(methodOn(BrowserConsumerResource.class).getConsumer()).withRel("new"));
-        browserConsumer.add(linkTo(methodOn(BrowserConsumerResource.class).getConsumer(browserConsumer.getConsumerId())).withSelfRel());
-        topics.keySet().forEach(topic -> browserConsumer.add(linkTo(methodOn(TopicResource.class).get(browserConsumer.getConsumerId(), topic)).withRel("topics")));
-
-        browserConsumerStore.add(browserConsumer);
-
-        return getConsumer(browserConsumer.getConsumerId());
+    public ResponseEntity<BrowserConsumer> createConsumer() {
+        return createConsumer(defaultBrowserConsumerRequest());
     }
 
     @RequestMapping(path = "/consumer/{consumerId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<BrowserConsumer> getConsumer(@PathVariable String consumerId) {
         BrowserConsumer browserConsumer = browserConsumerStore.get(consumerId);
         if (browserConsumer == null) {
-            return ResponseEntity.notFound().build();
+            throw new IllegalArgumentException(String.format("ConsumerId: %s unknown.", consumerId));
         }
         return ResponseEntity.ok(browserConsumer);
+    }
+
+    @RequestMapping(path = "/consumer", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public ResponseEntity<BrowserConsumer> createConsumer(@RequestBody BrowserConsumerRequest browserConsumerRequest) {
+        try {
+            Deserializer keyDeserializer = (Deserializer) Class.forName(browserConsumerRequest.getKeyDeserializer()).newInstance();
+            Deserializer valueDeserializer = (Deserializer) Class.forName(browserConsumerRequest.getKeyDeserializer()).newInstance();
+
+            Map<String, Object> consumerProperties = kafkaProperties.buildConsumerProperties();
+            consumerProperties.put(ConsumerConfig.GROUP_ID_CONFIG, String.format("browser-%s", Math.abs(random.nextInt())));
+            consumerProperties.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
+            consumerProperties.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "false");
+            DefaultKafkaConsumerFactory defaultKafkaConsumerFactory = new DefaultKafkaConsumerFactory(consumerProperties, keyDeserializer, valueDeserializer);
+
+            Consumer kafkaConsumer = defaultKafkaConsumerFactory.createConsumer();
+
+            Map<String, List<PartitionInfo>> topics = kafkaConsumer.listTopics();
+
+
+            BrowserConsumer browserConsumer = new BrowserConsumer(kafkaConsumer, (Integer) consumerProperties.get(ConsumerConfig.MAX_POLL_RECORDS_CONFIG), browserConsumerRequest.getKeyDeserializer(), browserConsumerRequest.getValueDeserializer());
+
+            browserConsumer.add(linkTo(methodOn(ApplicationResource.class).get()).withRel("browser"));
+            browserConsumer.add(linkTo(methodOn(BrowserConsumerResource.class).getConsumer(browserConsumer.getConsumerId())).withSelfRel());
+            topics.keySet().forEach(topic -> browserConsumer.add(linkTo(methodOn(TopicResource.class).get(browserConsumer.getConsumerId(), topic)).withRel("topics")));
+            browserConsumerStore.add(browserConsumer);
+
+            return getConsumer(browserConsumer.getConsumerId());
+        } catch (ClassNotFoundException | IllegalAccessException | InstantiationException ex) {
+            LOGGER.error("{}", ex.getMessage(), ex);
+            throw new IllegalArgumentException(ex.getMessage());
+        }
+    }
+
+    private BrowserConsumerRequest defaultBrowserConsumerRequest() {
+        return new BrowserConsumerRequest(StringDeserializer.class.getName(), StringDeserializer.class.getName());
     }
 }

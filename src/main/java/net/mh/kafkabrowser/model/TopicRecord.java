@@ -1,7 +1,5 @@
 package net.mh.kafkabrowser.model;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import java.time.LocalDateTime;
 
 /**

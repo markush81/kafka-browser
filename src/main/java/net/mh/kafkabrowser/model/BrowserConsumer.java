@@ -16,6 +16,8 @@ public class BrowserConsumer extends ResourceSupport {
 
     private final String consumerId;
     private final Consumer consumer;
+    private final String keyDeserializer;
+    private final String valueDeserializer;
     private Integer stepSize;
     private Map<String, Map<TopicPartition, Long>> topicStart;
     private Map<String, Map<TopicPartition, Long>> topicEnd;
@@ -23,7 +25,7 @@ public class BrowserConsumer extends ResourceSupport {
     private Map<String, Map<TopicPartition, Long>> pageStart;
     private Map<String, Map<TopicPartition, Long>> pageEnd;
 
-    public BrowserConsumer(Consumer consumer, Integer stepSize) {
+    public BrowserConsumer(Consumer consumer, Integer stepSize, String keyDeserializer, String valueDeserializer) {
         this.consumerId = UUID.randomUUID().toString();
         this.topicStart = new HashMap<>();
         this.topicEnd = new HashMap<>();
@@ -31,6 +33,8 @@ public class BrowserConsumer extends ResourceSupport {
         this.pageStart = new HashMap<>();
         this.consumer = consumer;
         this.stepSize = stepSize;
+        this.keyDeserializer = keyDeserializer;
+        this.valueDeserializer = valueDeserializer;
     }
 
     @JsonIgnore
@@ -66,7 +70,6 @@ public class BrowserConsumer extends ResourceSupport {
         pageStart.put(topic, copy);
     }
 
-
     @JsonIgnore
     public Map<TopicPartition, Long> getTopicStart(String topic) {
         return this.topicStart.getOrDefault(topic, new HashMap<>());
@@ -99,6 +102,14 @@ public class BrowserConsumer extends ResourceSupport {
         Map<TopicPartition, Long> pageStart = getPageStart(topic);
         Map<TopicPartition, Long> topicStart = getTopicStart(topic);
         return pageStart.keySet().stream().anyMatch(key -> pageStart.get(key) - topicStart.get(key) > 0);
+    }
+
+    public String getKeyDeserializer() {
+        return keyDeserializer;
+    }
+
+    public String getValueDeserializer() {
+        return valueDeserializer;
     }
 
     @JsonIgnore

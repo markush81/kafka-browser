@@ -1,0 +1,4 @@
+{
+    "keyDeserializer": "org.apache.kafka.common.serialization.LongDeserializer",
+    "valueDeserializer": "org.apache.kafka.common.serialization.StringDeserializer"
+}

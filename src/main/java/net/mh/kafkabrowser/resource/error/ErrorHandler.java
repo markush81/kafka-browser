@@ -17,9 +17,9 @@ public class ErrorHandler implements ErrorController {
     private static final String ERROR_PATH = "/error";
 
     @RequestMapping(path = ERROR_PATH)
-    public ResponseEntity<String> handle(HttpServletRequest request) {
+    public ResponseEntity<ErrorMessage> handle(HttpServletRequest request) {
         HttpStatus status = getStatus(request);
-        return new ResponseEntity<>(status.getReasonPhrase(), status);
+        return new ResponseEntity<>(new ErrorMessage(status.getReasonPhrase()), status);
     }
 
     private HttpStatus getStatus(HttpServletRequest request) {

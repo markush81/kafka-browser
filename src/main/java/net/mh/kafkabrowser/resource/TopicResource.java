@@ -13,10 +13,12 @@ import org.apache.kafka.common.TopicPartition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -33,7 +35,7 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 @RestController
 @RequestMapping
-public class TopicResource {
+public class TopicResource extends AbstractResource {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TopicResource.class);
     @Autowired
@@ -141,10 +143,5 @@ public class TopicResource {
 
         LOGGER.debug("After: {}", browserConsumer);
         return ResponseEntity.ok(topic);
-    }
-
-    @ExceptionHandler({IllegalArgumentException.class})
-    public ResponseEntity<String> handleException(IllegalArgumentException exception) {
-        return new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
     }
 }
