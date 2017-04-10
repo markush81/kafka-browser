@@ -14,16 +14,20 @@ import java.util.UUID;
  */
 public class BrowserConsumer extends ResourceSupport {
 
-    private final String consumerId;
-    private final Consumer consumer;
-    private final String keyDeserializer;
-    private final String valueDeserializer;
+    private String consumerId;
+    private Consumer consumer;
+    private String keyDeserializer;
+    private String valueDeserializer;
     private Integer stepSize;
     private Map<String, Map<TopicPartition, Long>> topicStart;
     private Map<String, Map<TopicPartition, Long>> topicEnd;
 
     private Map<String, Map<TopicPartition, Long>> pageStart;
     private Map<String, Map<TopicPartition, Long>> pageEnd;
+
+    public BrowserConsumer() {
+        //JSON
+    }
 
     public BrowserConsumer(Consumer consumer, Integer stepSize, String keyDeserializer, String valueDeserializer) {
         this.consumerId = UUID.randomUUID().toString();

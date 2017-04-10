@@ -8,6 +8,7 @@ public class ErrorMessage {
     private String message;
 
     public ErrorMessage() {
+        //JSON
     }
 
     public ErrorMessage(String message) {

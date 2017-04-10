@@ -1,5 +1,6 @@
 package net.mh.kafkabrowser.resource;
 
+import net.mh.kafkabrowser.kafka.KafkaConfiguration;
 import net.mh.kafkabrowser.model.BrowserConsumer;
 import net.mh.kafkabrowser.model.BrowserConsumerRequest;
 import net.mh.kafkabrowser.store.BrowserConsumerStore;
@@ -11,7 +12,6 @@ import org.apache.kafka.common.serialization.StringDeserializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
@@ -34,13 +34,13 @@ public class BrowserConsumerResource extends AbstractResource {
     private static final Logger LOGGER = LoggerFactory.getLogger(BrowserConsumerResource.class);
 
     private Random random;
-    private KafkaProperties kafkaProperties;
+    private KafkaConfiguration kafkaConfiguration;
     private BrowserConsumerStore browserConsumerStore;
 
     @Autowired
-    public BrowserConsumerResource(KafkaProperties kafkaProperties, BrowserConsumerStore browserConsumerStore) {
+    public BrowserConsumerResource(KafkaConfiguration kafkaConfiguration, BrowserConsumerStore browserConsumerStore) {
         this.random = new Random();
-        this.kafkaProperties = kafkaProperties;
+        this.kafkaConfiguration = kafkaConfiguration;
         this.browserConsumerStore = browserConsumerStore;
     }
 
@@ -64,18 +64,18 @@ public class BrowserConsumerResource extends AbstractResource {
             Deserializer keyDeserializer = (Deserializer) Class.forName(browserConsumerRequest.getKeyDeserializer()).newInstance();
             Deserializer valueDeserializer = (Deserializer) Class.forName(browserConsumerRequest.getKeyDeserializer()).newInstance();
 
-            Map<String, Object> consumerProperties = kafkaProperties.buildConsumerProperties();
-            consumerProperties.put(ConsumerConfig.GROUP_ID_CONFIG, String.format("browser-%s", Math.abs(random.nextInt())));
-            consumerProperties.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
-            consumerProperties.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "false");
-            DefaultKafkaConsumerFactory defaultKafkaConsumerFactory = new DefaultKafkaConsumerFactory(consumerProperties, keyDeserializer, valueDeserializer);
+            Map<String, Object> consumerConfigs = kafkaConfiguration.consumerConfigs();
+            consumerConfigs.put(ConsumerConfig.GROUP_ID_CONFIG, String.format("browser-%s", Math.abs(random.nextInt()))); //NOSONAR
+            consumerConfigs.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
+            consumerConfigs.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "false");
+            DefaultKafkaConsumerFactory defaultKafkaConsumerFactory = new DefaultKafkaConsumerFactory(consumerConfigs, keyDeserializer, valueDeserializer);
 
             Consumer kafkaConsumer = defaultKafkaConsumerFactory.createConsumer();
 
             Map<String, List<PartitionInfo>> topics = kafkaConsumer.listTopics();
 
 
-            BrowserConsumer browserConsumer = new BrowserConsumer(kafkaConsumer, (Integer) consumerProperties.get(ConsumerConfig.MAX_POLL_RECORDS_CONFIG), browserConsumerRequest.getKeyDeserializer(), browserConsumerRequest.getValueDeserializer());
+            BrowserConsumer browserConsumer = new BrowserConsumer(kafkaConsumer, (Integer) consumerConfigs.get(ConsumerConfig.MAX_POLL_RECORDS_CONFIG), browserConsumerRequest.getKeyDeserializer(), browserConsumerRequest.getValueDeserializer());
 
             browserConsumer.add(linkTo(methodOn(ApplicationResource.class).get()).withRel("browser"));
             browserConsumer.add(linkTo(methodOn(BrowserConsumerResource.class).getConsumer(browserConsumer.getConsumerId())).withSelfRel());

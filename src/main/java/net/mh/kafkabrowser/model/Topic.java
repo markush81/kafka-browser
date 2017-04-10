@@ -19,6 +19,10 @@ public class Topic extends ResourceSupport {
     private Map<TopicPartition, Long> begin;
     private Map<TopicPartition, Long> end;
 
+    public Topic() {
+        //JSON
+    }
+
     public Topic(String name) {
         this.name = name;
     }

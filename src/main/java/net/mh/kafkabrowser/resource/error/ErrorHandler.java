@@ -14,7 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 @RestController
 public class ErrorHandler implements ErrorController {
 
-    private static final String ERROR_PATH = "/error";
+    private static final String ERROR_PATH = "/error";//NOSONAR
 
     @RequestMapping(path = ERROR_PATH)
     public ResponseEntity<ErrorMessage> handle(HttpServletRequest request) {
@@ -29,7 +29,7 @@ public class ErrorHandler implements ErrorController {
         }
         try {
             return HttpStatus.valueOf(statusCode);
-        } catch (IllegalArgumentException ex) {
+        } catch (IllegalArgumentException ex) {// NOSONAR
             return HttpStatus.INTERNAL_SERVER_ERROR;
         }
     }

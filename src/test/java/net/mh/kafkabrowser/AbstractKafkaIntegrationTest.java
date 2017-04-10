@@ -1,11 +1,8 @@
 package net.mh.kafkabrowser;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.kafka.clients.consumer.ConsumerConfig;
+import net.mh.kafkabrowser.kafka.KafkaConfiguration;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.apache.kafka.clients.producer.ProducerConfig;
-import org.apache.kafka.common.serialization.LongDeserializer;
-import org.apache.kafka.common.serialization.StringDeserializer;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -17,10 +14,7 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.hateoas.hal.Jackson2HalModule;
-import org.springframework.http.HttpRequest;
-import org.springframework.http.client.ClientHttpRequestExecution;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
-import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.listener.KafkaMessageListenerContainer;
 import org.springframework.kafka.listener.MessageListener;
@@ -31,7 +25,7 @@ import org.springframework.kafka.test.utils.KafkaTestUtils;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 
-import java.io.IOException;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -48,18 +42,16 @@ public class AbstractKafkaIntegrationTest {
     @ClassRule
     public static KafkaEmbedded embeddedKafka = new KafkaEmbedded(2, true, 4, "test");
 
-    protected BlockingQueue<ConsumerRecord<Long, String>> records;
-    private KafkaMessageListenerContainer<Long, String> container;
+    protected BlockingQueue<ConsumerRecord<Integer, String>> records;
+    private KafkaMessageListenerContainer<Integer, String> container;
 
     @Before
     public void setUp() throws Exception {
         Map<String, Object> consumerProps = KafkaTestUtils.consumerProps("test-group", "true", embeddedKafka);
-        consumerProps.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, LongDeserializer.class.getName());
-        consumerProps.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
-        DefaultKafkaConsumerFactory<Long, String> cf = new DefaultKafkaConsumerFactory<>(consumerProps);
+        DefaultKafkaConsumerFactory<Integer, String> cf = new DefaultKafkaConsumerFactory<>(consumerProps);
         container = new KafkaMessageListenerContainer<>(cf, new ContainerProperties("test"));
         records = new LinkedBlockingQueue<>();
-        container.setupMessageListener((MessageListener<Long, String>) record -> records.add(record));
+        container.setupMessageListener((MessageListener<Integer, String>) record -> records.add(record));
         container.start();
         ContainerTestUtils.waitForAssignment(container, embeddedKafka.getPartitionsPerTopic()); // we create three topics
     }
@@ -78,17 +70,9 @@ public class AbstractKafkaIntegrationTest {
         private ObjectMapper objectMapper;
 
         @Bean
-        public Map<String, Object> producerConfigs() {
-            Map<String, Object> producerConfigs = kafkaProperties.buildProducerProperties();
-            producerConfigs.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, KafkaTestUtils.producerProps(embeddedKafka).get(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG));
-            return producerConfigs;
-        }
-
-        @Bean
-        public Map<String, Object> consumerConfigs() {
-            Map<String, Object> consumerConfigs = kafkaProperties.buildConsumerProperties();
-            consumerConfigs.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, KafkaTestUtils.producerProps(embeddedKafka).get(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG));
-            return consumerConfigs;
+        public KafkaConfiguration kafkaConfiguration() {
+            kafkaProperties.setBootstrapServers(Arrays.asList(embeddedKafka.getBrokersAsString().split(",")));
+            return new KafkaConfiguration(kafkaProperties);
         }
 
         @Bean

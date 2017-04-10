@@ -12,6 +12,7 @@ public class BrowserConsumerRequest {
     private String valueDeserializer;
 
     public BrowserConsumerRequest() {
+        //JSON
     }
 
     public BrowserConsumerRequest(String keyDeserializer, String valueDeserializer) {
