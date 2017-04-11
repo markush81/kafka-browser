@@ -4,7 +4,6 @@ import net.mh.kafkabrowser.model.BrowserConsumer;
 import net.mh.kafkabrowser.model.Topic;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,17 +31,9 @@ public class SmallTopicIntegrationTest extends AbstractKafkaIntegrationTest {
 
     @Autowired
     private TestRestTemplate restTemplate;
-
-    @Before
-    public void setUp() throws Exception {
-        KafkaProducer<Integer, String> kafkaProducer = new KafkaProducer<>(KafkaTestUtils.producerProps(embeddedKafka));
-        for (Integer i = 0; i < 10; i++) {
-            kafkaProducer.send(new ProducerRecord<>("test", i, "test" + i));
-        }
-    }
-
+    
     @Test
-    public void testTopics() {
+    public void testTopics_EmptyPage() {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
         ResponseEntity<BrowserConsumer> browserConsumer = restTemplate.postForEntity("/consumer", new HttpEntity<>("{\"keyDeserializer\": \"org.apache.kafka.common.serialization.IntegerDeserializer\", \"valueDeserializer\": \"org.apache.kafka.common.serialization.StringDeserializer\"}", headers), BrowserConsumer.class);
@@ -54,11 +45,25 @@ public class SmallTopicIntegrationTest extends AbstractKafkaIntegrationTest {
         assertThat(topics, notNullValue());
         assertThat(topics.getHref(), endsWith("test"));
 
-        assertThat(() -> restTemplate.getForEntity(String.format("/consumer/%s/topic/test", body.getConsumerId()), Topic.class).getBody().getCurrentRecords(), eventuallyEval(hasSize(10), Duration.ofSeconds(10)));
-
         ResponseEntity<Topic> topic = restTemplate.getForEntity(String.format("/consumer/%s/topic/test", body.getConsumerId()), Topic.class);
+
         Topic topicBody = topic.getBody();
         assertThat(topicBody.hasLink("next"), is(false));
         assertThat(topicBody.hasLink("previous"), is(false));
+    }
+
+    @Test
+    public void testTopics_OnePage() {
+        KafkaProducer<Integer, String> kafkaProducer = new KafkaProducer<>(KafkaTestUtils.producerProps(embeddedKafka));
+        for (Integer i = 0; i < 10; i++) {
+            kafkaProducer.send(new ProducerRecord<>("test", i, "test" + i));
+        }
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
+        ResponseEntity<BrowserConsumer> browserConsumer = restTemplate.postForEntity("/consumer", new HttpEntity<>("{\"keyDeserializer\": \"org.apache.kafka.common.serialization.IntegerDeserializer\", \"valueDeserializer\": \"org.apache.kafka.common.serialization.StringDeserializer\"}", headers), BrowserConsumer.class);
+        assertThat(browserConsumer.getStatusCode(), equalTo(HttpStatus.OK));
+
+        assertThat(() -> restTemplate.getForEntity(String.format("/consumer/%s/topic/test", browserConsumer.getBody().getConsumerId()), Topic.class).getBody().getCurrentRecords(), eventuallyEval(hasSize(10), Duration.ofSeconds(10)));
     }
 }
