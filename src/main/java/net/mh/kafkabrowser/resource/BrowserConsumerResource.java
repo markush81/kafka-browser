@@ -62,7 +62,7 @@ public class BrowserConsumerResource extends AbstractResource {
     public ResponseEntity<BrowserConsumer> createConsumer(@RequestBody BrowserConsumerRequest browserConsumerRequest) {
         try {
             Deserializer keyDeserializer = (Deserializer) Class.forName(browserConsumerRequest.getKeyDeserializer()).newInstance();
-            Deserializer valueDeserializer = (Deserializer) Class.forName(browserConsumerRequest.getKeyDeserializer()).newInstance();
+            Deserializer valueDeserializer = (Deserializer) Class.forName(browserConsumerRequest.getValueDeserializer()).newInstance();
 
             Map<String, Object> consumerConfigs = kafkaConfiguration.consumerConfigs();
             consumerConfigs.put(ConsumerConfig.GROUP_ID_CONFIG, String.format("browser-%s", Math.abs(random.nextInt()))); //NOSONAR

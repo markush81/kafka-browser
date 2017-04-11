@@ -1,6 +1,7 @@
 package net.mh.kafkabrowser.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.common.TopicPartition;
 import org.springframework.hateoas.ResourceSupport;
@@ -12,6 +13,7 @@ import java.util.UUID;
 /**
  * Created by markus on 08.04.17.
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class BrowserConsumer extends ResourceSupport {
 
     private String consumerId;

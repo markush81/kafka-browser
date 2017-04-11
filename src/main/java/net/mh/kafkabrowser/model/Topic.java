@@ -1,6 +1,7 @@
 package net.mh.kafkabrowser.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.apache.kafka.common.TopicPartition;
 import org.springframework.hateoas.ResourceSupport;
 
@@ -11,6 +12,7 @@ import java.util.Set;
 /**
  * Created by markus on 05.04.17.
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Topic extends ResourceSupport {
 
     private String name;

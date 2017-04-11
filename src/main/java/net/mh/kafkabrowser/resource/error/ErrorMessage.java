@@ -1,8 +1,11 @@
 package net.mh.kafkabrowser.resource.error;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 /**
  * Created by markus on 09.04.17.
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class ErrorMessage {
 
     private String message;

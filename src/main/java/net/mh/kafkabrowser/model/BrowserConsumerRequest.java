@@ -35,12 +35,4 @@ public class BrowserConsumerRequest {
     public void setValueDeserializer(String valueDeserializer) {
         this.valueDeserializer = valueDeserializer;
     }
-
-    @Override
-    public String toString() {
-        return "BrowserConsumerRequest{" +
-                "keyDeserializer='" + keyDeserializer + '\'' +
-                ", valueDeserializer='" + valueDeserializer + '\'' +
-                '}';
-    }
 }
