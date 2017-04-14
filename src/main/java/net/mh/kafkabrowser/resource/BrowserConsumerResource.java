@@ -85,7 +85,7 @@ public class BrowserConsumerResource extends AbstractResource {
             return getConsumer(browserConsumer.getConsumerId());
         } catch (ClassNotFoundException | IllegalAccessException | InstantiationException ex) {
             LOGGER.error("{}", ex.getMessage(), ex);
-            throw new IllegalArgumentException(ex.getMessage());
+            throw new IllegalArgumentException(String.format("%s: %s", ex.getClass().getName(), ex.getMessage()));
         }
     }
 

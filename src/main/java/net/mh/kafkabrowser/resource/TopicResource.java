@@ -113,7 +113,7 @@ public class TopicResource extends AbstractResource {
             topicPartitions.forEach(tp -> LOGGER.debug("Before poll {} - {}.", tp, kafkaConsumer.position(tp)));
         }
 
-        ConsumerRecords records = kafkaConsumer.poll(200);
+        ConsumerRecords records = kafkaConsumer.poll(400);
         List<TopicRecord> topicRecords = new ArrayList<>();
         Iterator<ConsumerRecord> iterator = records.iterator();
         iterator.forEachRemaining(cr -> topicRecords.add(new TopicRecord(cr.timestampType().name, LocalDateTime.ofInstant(Instant.ofEpochMilli(cr.timestamp()), ZoneId.systemDefault()), String.valueOf(cr.key()), String.valueOf(cr.value()))));

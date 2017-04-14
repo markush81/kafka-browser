@@ -130,14 +130,4 @@ public class BrowserConsumer extends ResourceSupport {
         this.pageEnd.clear();
         this.pageStart.clear();
     }
-
-    @Override
-    public String toString() {
-        return "BrowserConsumer{" +
-                "topicStart=" + topicStart +
-                ", topicEnd=" + topicEnd +
-                ", pageStart=" + pageStart +
-                ", pageEnd=" + pageEnd +
-                '}';
-    }
 }

@@ -1,6 +1,7 @@
 package net.mh.kafkabrowser;
 
 import net.mh.kafkabrowser.model.BrowserConsumer;
+import net.mh.kafkabrowser.resource.error.ErrorMessage;
 import org.apache.kafka.common.serialization.LongDeserializer;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.junit.Test;
@@ -46,5 +47,24 @@ public class BrowserConsumerIntegrationTest extends AbstractKafkaIntegrationTest
         BrowserConsumer browserConsumerBody = browserConsumer.getBody();
         assertThat(browserConsumerBody.getKeyDeserializer(), equalTo(LongDeserializer.class.getName()));
         assertThat(browserConsumerBody.getValueDeserializer(), equalTo(StringDeserializer.class.getName()));
+    }
+
+    @Test
+    public void testUnknownConsumer() {
+        ResponseEntity<ErrorMessage> error = restTemplate.getForEntity("/consumer/101010101", ErrorMessage.class);
+        assertThat(error.getStatusCode(), equalTo(HttpStatus.BAD_REQUEST));
+        assertThat(error.getBody().getMessage(), equalTo("ConsumerId: 101010101 unknown."));
+    }
+
+
+    @Test
+    public void testWrongDeserializer() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
+        ResponseEntity<ErrorMessage> error = restTemplate.postForEntity("/consumer", new HttpEntity<>("{\"keyDeserializer\": \"org.apache.kafka.common.serialization.WooDoo\", \"valueDeserializer\": \"org.apache.kafka.common.serialization.StringDeserializer\"}", headers), ErrorMessage.class);
+        assertThat(error.getStatusCode(), equalTo(HttpStatus.BAD_REQUEST));
+        String message = error.getBody().getMessage();
+        assertThat(message, containsString("java.lang.ClassNotFoundException"));
+        assertThat(message, containsString("org.apache.kafka.common.serialization.WooDoo"));
     }
 }

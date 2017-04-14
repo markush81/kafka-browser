@@ -2,6 +2,7 @@ package net.mh.kafkabrowser;
 
 import net.mh.kafkabrowser.model.Application;
 import net.mh.kafkabrowser.model.BrowserConsumer;
+import net.mh.kafkabrowser.resource.error.ErrorMessage;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,5 +44,12 @@ public class KafkaBrowserIntegrationTest extends AbstractKafkaIntegrationTest {
         Link consumers = application.getBody().getLink("consumers");
         assertThat(consumers, notNullValue());
         assertThat(consumers.getHref(), endsWith(browserConsumer.getBody().getConsumerId()));
+    }
+
+    @Test
+    public void test404() throws InterruptedException {
+        ResponseEntity<ErrorMessage> error = restTemplate.getForEntity("/unknown", ErrorMessage.class);
+        assertThat(error.getStatusCode(), equalTo(HttpStatus.NOT_FOUND));
+        assertThat(error.getBody().getMessage(), equalTo("Not Found"));
     }
 }

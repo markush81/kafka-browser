@@ -1,12 +1,9 @@
 package net.mh.kafkabrowser.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import org.apache.kafka.common.TopicPartition;
 import org.springframework.hateoas.ResourceSupport;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -18,8 +15,6 @@ public class Topic extends ResourceSupport {
     private String name;
     private Set<Integer> topicPartitions;
     private List<TopicRecord> currentRecords;
-    private Map<TopicPartition, Long> begin;
-    private Map<TopicPartition, Long> end;
 
     public Topic() {
         //JSON
@@ -51,23 +46,5 @@ public class Topic extends ResourceSupport {
 
     public void setCurrentRecords(List<TopicRecord> currentRecords) {
         this.currentRecords = currentRecords;
-    }
-
-    @JsonIgnore
-    public Map<TopicPartition, Long> getBegin() {
-        return begin;
-    }
-
-    public void setBegin(Map<TopicPartition, Long> begin) {
-        this.begin = begin;
-    }
-
-    @JsonIgnore
-    public Map<TopicPartition, Long> getEnd() {
-        return end;
-    }
-
-    public void setEnd(Map<TopicPartition, Long> end) {
-        this.end = end;
     }
 }
