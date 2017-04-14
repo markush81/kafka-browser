@@ -8,6 +8,7 @@ import org.springframework.hateoas.ResourceSupport;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -129,5 +130,34 @@ public class BrowserConsumer extends ResourceSupport {
         this.topicEnd.clear();
         this.pageEnd.clear();
         this.pageStart.clear();
+    }
+
+    @Override
+    @SuppressWarnings({"squid:S1067"})
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        if (!super.equals(o)) {
+            return false;
+        }
+        BrowserConsumer that = (BrowserConsumer) o;
+        return Objects.equals(consumerId, that.consumerId) &&
+                Objects.equals(consumer, that.consumer) &&
+                Objects.equals(keyDeserializer, that.keyDeserializer) &&
+                Objects.equals(valueDeserializer, that.valueDeserializer) &&
+                Objects.equals(stepSize, that.stepSize) &&
+                Objects.equals(topicStart, that.topicStart) &&
+                Objects.equals(topicEnd, that.topicEnd) &&
+                Objects.equals(pageStart, that.pageStart) &&
+                Objects.equals(pageEnd, that.pageEnd);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), consumerId, consumer, keyDeserializer, valueDeserializer, stepSize, topicStart, topicEnd, pageStart, pageEnd);
     }
 }

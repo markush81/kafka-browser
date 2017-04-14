@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.springframework.hateoas.ResourceSupport;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -46,5 +47,27 @@ public class Topic extends ResourceSupport {
 
     public void setCurrentRecords(List<TopicRecord> currentRecords) {
         this.currentRecords = currentRecords;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        if (!super.equals(o)) {
+            return false;
+        }
+        Topic topic = (Topic) o;
+        return Objects.equals(name, topic.name) &&
+                Objects.equals(topicPartitions, topic.topicPartitions) &&
+                Objects.equals(currentRecords, topic.currentRecords);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), name, topicPartitions, currentRecords);
     }
 }
