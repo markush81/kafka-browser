@@ -98,16 +98,16 @@ public class BrowserConsumer extends ResourceSupport {
 
     @JsonIgnore
     public boolean hasMore(String topic) {
-        Map<TopicPartition, Long> pageEnd = getPageEnd(topic);
-        Map<TopicPartition, Long> topicEnd = getTopicEnd(topic);
-        return topicEnd.keySet().stream().anyMatch(key -> topicEnd.get(key) - pageEnd.get(key) > 0);
+        Map<TopicPartition, Long> tPageEnd = getPageEnd(topic);
+        Map<TopicPartition, Long> tEnd = getTopicEnd(topic);
+        return tEnd.keySet().stream().anyMatch(key -> tEnd.get(key) - tPageEnd.get(key) > 0);
     }
 
     @JsonIgnore
     public boolean hasPrevious(String topic) {
-        Map<TopicPartition, Long> pageStart = getPageStart(topic);
-        Map<TopicPartition, Long> topicStart = getTopicStart(topic);
-        return pageStart.keySet().stream().anyMatch(key -> pageStart.get(key) - topicStart.get(key) > 0);
+        Map<TopicPartition, Long> tPageStart = getPageStart(topic);
+        Map<TopicPartition, Long> tStart = getTopicStart(topic);
+        return tPageStart.keySet().stream().anyMatch(key -> tPageStart.get(key) - tStart.get(key) > 0);
     }
 
     public String getKeyDeserializer() {
