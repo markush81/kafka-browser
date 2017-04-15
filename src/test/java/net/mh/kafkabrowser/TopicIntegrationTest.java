@@ -71,7 +71,7 @@ public class TopicIntegrationTest extends AbstractKafkaIntegrationTest {
         ResponseEntity<BrowserConsumer> browserConsumer = restTemplate.postForEntity("/consumer", new HttpEntity<>("{\"keyDeserializer\": \"org.apache.kafka.common.serialization.IntegerDeserializer\", \"valueDeserializer\": \"org.apache.kafka.common.serialization.StringDeserializer\"}", headers), BrowserConsumer.class);
         assertThat(browserConsumer.getStatusCode(), equalTo(HttpStatus.OK));
 
-        assertThat(() -> restTemplate.getForEntity(String.format("/consumer/%s/topic/test", browserConsumer.getBody().getConsumerId()), Topic.class).getBody().getCurrentRecords(), eventuallyEval(hasSize(greaterThan(5)), TIMEOUT));
+        assertThat(() -> restTemplate.getForEntity(String.format("/consumer/%s/topic/test", browserConsumer.getBody().getConsumerId()), Topic.class).getBody().getCurrentRecords(), eventuallyEval(hasSize(greaterThanOrEqualTo(5)), TIMEOUT));
     }
 
     @Test
@@ -86,7 +86,7 @@ public class TopicIntegrationTest extends AbstractKafkaIntegrationTest {
         ResponseEntity<BrowserConsumer> browserConsumer = restTemplate.postForEntity("/consumer", new HttpEntity<>("{\"keyDeserializer\": \"org.apache.kafka.common.serialization.IntegerDeserializer\", \"valueDeserializer\": \"org.apache.kafka.common.serialization.StringDeserializer\"}", headers), BrowserConsumer.class);
         assertThat(browserConsumer.getStatusCode(), equalTo(HttpStatus.OK));
 
-        assertThat(() -> restTemplate.getForEntity(String.format("/consumer/%s/topic/test", browserConsumer.getBody().getConsumerId()), Topic.class).getBody().getCurrentRecords(), eventuallyEval(hasSize(greaterThan(5)), TIMEOUT));
+        assertThat(() -> restTemplate.getForEntity(String.format("/consumer/%s/topic/test", browserConsumer.getBody().getConsumerId()), Topic.class).getBody().getCurrentRecords(), eventuallyEval(hasSize(greaterThanOrEqualTo(5)), TIMEOUT));
 
         assertThat(() -> restTemplate.getForEntity(String.format("/consumer/%s/topic/test", browserConsumer.getBody().getConsumerId()), Topic.class).getBody(), eventuallyEval(new BaseMatcher<Topic>() {
             @Override
@@ -100,7 +100,7 @@ public class TopicIntegrationTest extends AbstractKafkaIntegrationTest {
             }
         }, TIMEOUT));
 
-        assertThat(() -> restTemplate.getForEntity(String.format("/consumer/%s/topic/test/next", browserConsumer.getBody().getConsumerId()), Topic.class).getBody().getCurrentRecords(), eventuallyEval(hasSize(greaterThan(5)), TIMEOUT));
+        assertThat(() -> restTemplate.getForEntity(String.format("/consumer/%s/topic/test/next", browserConsumer.getBody().getConsumerId()), Topic.class).getBody().getCurrentRecords(), eventuallyEval(hasSize(greaterThanOrEqualTo(5)), TIMEOUT));
 
         assertThat(() -> restTemplate.getForEntity(String.format("/consumer/%s/topic/test/next", browserConsumer.getBody().getConsumerId()), Topic.class).getBody(), eventuallyEval(new BaseMatcher<Topic>() {
             @Override
@@ -114,8 +114,8 @@ public class TopicIntegrationTest extends AbstractKafkaIntegrationTest {
             }
         }, TIMEOUT));
 
-        assertThat(() -> restTemplate.getForEntity(String.format("/consumer/%s/topic/test/back", browserConsumer.getBody().getConsumerId()), Topic.class).getBody().getCurrentRecords(), eventuallyEval(hasSize(greaterThan(5)), TIMEOUT));
-        assertThat(() -> restTemplate.getForEntity(String.format("/consumer/%s/topic/test/back", browserConsumer.getBody().getConsumerId()), Topic.class).getBody().getCurrentRecords(), eventuallyEval(hasSize(greaterThan(5)), TIMEOUT));
+        assertThat(() -> restTemplate.getForEntity(String.format("/consumer/%s/topic/test/back", browserConsumer.getBody().getConsumerId()), Topic.class).getBody().getCurrentRecords(), eventuallyEval(hasSize(greaterThanOrEqualTo(5)), TIMEOUT));
+        assertThat(() -> restTemplate.getForEntity(String.format("/consumer/%s/topic/test/back", browserConsumer.getBody().getConsumerId()), Topic.class).getBody().getCurrentRecords(), eventuallyEval(hasSize(greaterThanOrEqualTo(5)), TIMEOUT));
     }
 
     @Test
