@@ -2,7 +2,7 @@
 
 Browse your Kafka Topics.
 
-[![Build Status](https://travis-ci.org/markush81/kafka-browser.svg?branch=master)](https://travis-ci.org/markush81/kafka-browser) [![Codacy Badge](https://api.codacy.com/project/badge/Grade/d447741dab7b49c8a8807225b25e8faf)](https://www.codacy.com/app/mhelbig81/kafka-browser?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=markush81/kafka-browser&amp;utm_campaign=Badge_Grade)
+[![Build Status](https://travis-ci.org/markush81/kafka-browser.svg?branch=master)](https://travis-ci.org/markush81/kafka-browser) [![Codacy Badge](https://api.codacy.com/project/badge/Grade/d447741dab7b49c8a8807225b25e8faf)](https://www.codacy.com/app/markush81/kafka-browser?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=markush81/kafka-browser&amp;utm_campaign=Badge_Grade)
 
 ***EARLY BETA PHASE***
 
