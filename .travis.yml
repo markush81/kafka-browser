@@ -4,22 +4,15 @@ sudo: false
 
 install: true
 
-addons:
-  sonarqube:
-    organization: "markush81-github"
-    token:
-      secure: "sJKTb2F/wy4S4cQm3rKPeUDU/cg5GlVdMXL8htQRyJraJWurhgZthffo1uOMXQkysvG2bcemXuuhnLRDT0wdsPhC/AChd1qslOBCHGts51yTQCn7Czdozdx3Qff+sLAie0r7Llo3VcGMI48MoH+3qRDRbiAI9UmwMcaI1dJhM0j+S/6avS60aF/l31R2Q24uodFpnPZiGJiAj39zdblGxGvm5U2cs2FdRHicAFsQqyJOdPj+3svX0S78oGvm27huqhgHjJfD7ymZC19MjT2hlheJZIgV0TXRl+hdyAGjqJa0uojDLUAytVpY3QQF4OAHP7DxqNzZVsbSWOaCVP6dIzRUUvuOZPZrv20uCPydjko53zqwCeyxjP2VY0GeZW0Sv5uzPJEKgk8vT8FCqTCEGcvCJKhSWS2Va4nxcX5RNRRSrY5XE6NSGhXoTNmW/vVgkSTjXjFawogITuPGN1pBePTNcr1Jxu3RBYmHcArP2JHMZVQW/zfpLyMI16FZ75l3+9pX1yzMVn4YiTqfnyhQNd4wnv2PlJkK1OBtdIsrDMZvwKLMIL+6LRpNZRjK6QaDSyXTjv6EZVxxsHdBUM+HsvlFgM3bt3j5bnHsZ0UZQyBJdZfBLTOCSfQBmU7j6GPCE1UDpy6awqTQmU1++tzNZwyF98zt/orFh7zMfDUWVJs="
-
 jdk:
 - oraclejdk8
 
 script:
-- ./gradlew sonarqube
+- ./gradlew build
 
 cache:
   directories:
   - $HOME/.m2/repository
-  - $HOME/.sonar/cache
   - $HOME/.gradle
   - .gradle
 

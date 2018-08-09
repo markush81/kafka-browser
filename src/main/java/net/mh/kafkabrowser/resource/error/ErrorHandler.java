@@ -14,7 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 @RestController
 public class ErrorHandler implements ErrorController {
 
-    private static final String ERROR_PATH = "/error";//NOSONAR
+    private static final String ERROR_PATH = "/error";
 
     @RequestMapping(path = ERROR_PATH)
     public ResponseEntity<ErrorMessage> handle(HttpServletRequest request) {

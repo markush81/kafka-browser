@@ -65,7 +65,7 @@ public class BrowserConsumerResource extends AbstractResource {
             Deserializer valueDeserializer = (Deserializer) Class.forName(browserConsumerRequest.getValueDeserializer()).newInstance();
 
             Map<String, Object> consumerConfigs = kafkaConfiguration.consumerConfigs();
-            consumerConfigs.put(ConsumerConfig.GROUP_ID_CONFIG, String.format("browser-%s", Math.abs(random.nextInt()))); //NOSONAR
+            consumerConfigs.put(ConsumerConfig.GROUP_ID_CONFIG, String.format("browser-%s", Math.abs(random.nextInt())));
             consumerConfigs.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
             consumerConfigs.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "false");
             DefaultKafkaConsumerFactory defaultKafkaConsumerFactory = new DefaultKafkaConsumerFactory(consumerConfigs, keyDeserializer, valueDeserializer);
