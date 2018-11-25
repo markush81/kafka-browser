@@ -1,0 +1,4 @@
+{
+    "keyDeserializer": "org.apache.kafka.common.serialization.StringDeserializer",
+    "valueDeserializer": "io.confluent.kafka.serializers.KafkaAvroDeserializer"
+}

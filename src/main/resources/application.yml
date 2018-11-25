@@ -2,9 +2,6 @@ spring:
   kafka:
     bootstrap-servers:
       - localhost:9092
-      #- 192.168.10.5:9092
-      #- 192.168.10.6:9092
-      #- 192.168.10.7:9092
     consumer:
       maxPollRecords: 10
   mvc.servlet.load-on-startup: 1
