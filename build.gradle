@@ -3,14 +3,13 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'org.springframework.boot:spring-boot-gradle-plugin:2.1.0.RELEASE'
+        classpath 'org.springframework.boot:spring-boot-gradle-plugin:2.1.7.RELEASE'
     }
 }
 
 plugins {
     id 'java'
     id 'idea'
-    id 'com.github.lkishalmi.gatling' version '3.0.1'
 }
 
 apply plugin: 'org.springframework.boot'
@@ -23,8 +22,10 @@ repositories {
     }
 }
 
-sourceCompatibility = JavaVersion.VERSION_1_10
-targetCompatibility = JavaVersion.VERSION_1_10
+compileJava {
+    sourceCompatibility = JavaVersion.VERSION_12
+    targetCompatibility = JavaVersion.VERSION_12
+}
 
 test {
     exclude '**/*IntegrationTest'
@@ -36,7 +37,7 @@ task integrationTest(type: Test) {
 test.finalizedBy integrationTest
 
 task sourcesJar(type: Jar, dependsOn: classes) {
-    classifier = 'sources'
+    archiveClassifier = 'sources'
     from sourceSets.main.allSource
 }
 
@@ -45,8 +46,7 @@ javadoc {
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
-    classifier = 'javadoc'
-    //noinspection GroovyAccessibility
+    archiveClassifier = 'javadoc'
     from javadoc.destinationDir
 }
 
@@ -62,7 +62,7 @@ dependencies {
     compile 'org.springframework.kafka:spring-kafka'
     compile 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
     
-    compile 'io.confluent:kafka-avro-serializer:5.0.1'
+    compile 'io.confluent:kafka-avro-serializer:5.3.0'
     
     testCompile 'org.springframework.boot:spring-boot-starter-test'
     testCompile('org.springframework.kafka:spring-kafka-test') {
@@ -74,9 +74,9 @@ dependencies {
 
 
 idea {
-    targetVersion = '18'
+    targetVersion = '19'
 }
 
-task wrapper(type: Wrapper) {
+wrapper {
     distributionType = Wrapper.DistributionType.ALL
 }
